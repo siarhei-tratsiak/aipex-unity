@@ -20,34 +20,45 @@ public class CameraController : MonoBehaviour
 
     private void HandleMovementInput()
     {
-        bool isUpPressed = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow);
-        bool isDownPressed = Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow);
-        bool isRightPressed = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow);
-        bool isLeftPressed = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow);
-
         Vector3 horizontalPositionChange = transform.forward * movementSpeed;
         Vector3 verticalPositionChange = transform.right * movementSpeed;
 
-        if (isUpPressed)
-        {
-            newPosition += horizontalPositionChange;
-        }
+        DirectionKeyManager[] keysAndShifts = {
+            new DirectionKeyManager(KeyCode.W, KeyCode.UpArrow, horizontalPositionChange),
+            new DirectionKeyManager(KeyCode.S, KeyCode.DownArrow, -horizontalPositionChange),
+            new DirectionKeyManager(KeyCode.D, KeyCode.RightArrow, verticalPositionChange),
+            new DirectionKeyManager(KeyCode.A, KeyCode.LeftArrow, -verticalPositionChange)
+        };
 
-        if (isDownPressed)
+        foreach (DirectionKeyManager keysAndShift in keysAndShifts)
         {
-            newPosition -= horizontalPositionChange;
-        }
-
-        if (isRightPressed)
-        {
-            newPosition += verticalPositionChange;
-        }
-
-        if (isLeftPressed)
-        {
-            newPosition -= verticalPositionChange;
+            ShiftPositionIfKeyPressed(keysAndShift);
         }
 
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
+    }
+
+    private void ShiftPositionIfKeyPressed(DirectionKeyManager keysAndShift)
+    {
+        bool isKeyPressed = Input.GetKey(keysAndShift.key1) || Input.GetKey(keysAndShift.key2);
+
+        if (isKeyPressed)
+        {
+            newPosition += keysAndShift.changePosition;
+        }
+    }
+
+    private class DirectionKeyManager
+    {
+        public KeyCode key1;
+        public KeyCode key2;
+        public Vector3 changePosition;
+
+        public DirectionKeyManager(KeyCode key1Value, KeyCode key2Value, Vector3 changePositionValue)
+        {
+            key1 = key1Value;
+            key2 = key2Value;
+            changePosition = changePositionValue;
+        }
     }
 }
