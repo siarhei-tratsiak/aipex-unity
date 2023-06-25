@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public float fastSpeed;
+    public float normalSpeed;
     public float movementSpeed;
     public float movementTime;
     private Vector3 newPosition;
@@ -20,31 +22,32 @@ public class CameraController : MonoBehaviour
 
     private void HandleMovementInput()
     {
+        movementSpeed = Input.GetKey(KeyCode.LeftShift) ? fastSpeed : normalSpeed;
         Vector3 horizontalPositionChange = transform.forward * movementSpeed;
         Vector3 verticalPositionChange = transform.right * movementSpeed;
 
-        DirectionKeyManager[] keysAndShifts = {
+        DirectionKeyManager[] directionKeyManagers = {
             new DirectionKeyManager(KeyCode.W, KeyCode.UpArrow, horizontalPositionChange),
             new DirectionKeyManager(KeyCode.S, KeyCode.DownArrow, -horizontalPositionChange),
             new DirectionKeyManager(KeyCode.D, KeyCode.RightArrow, verticalPositionChange),
             new DirectionKeyManager(KeyCode.A, KeyCode.LeftArrow, -verticalPositionChange)
         };
 
-        foreach (DirectionKeyManager keysAndShift in keysAndShifts)
+        foreach (DirectionKeyManager directionKeyManager in directionKeyManagers)
         {
-            ShiftPositionIfKeyPressed(keysAndShift);
+            ShiftPositionIfKeyPressed(directionKeyManager);
         }
 
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
     }
 
-    private void ShiftPositionIfKeyPressed(DirectionKeyManager keysAndShift)
+    private void ShiftPositionIfKeyPressed(DirectionKeyManager directionKeyManager)
     {
-        bool isKeyPressed = Input.GetKey(keysAndShift.key1) || Input.GetKey(keysAndShift.key2);
+        bool isKeyPressed = Input.GetKey(directionKeyManager.key1) || Input.GetKey(directionKeyManager.key2);
 
         if (isKeyPressed)
         {
-            newPosition += keysAndShift.changePosition;
+            newPosition += directionKeyManager.changePosition;
         }
     }
 
@@ -54,11 +57,11 @@ public class CameraController : MonoBehaviour
         public KeyCode key2;
         public Vector3 changePosition;
 
-        public DirectionKeyManager(KeyCode key1Value, KeyCode key2Value, Vector3 changePositionValue)
+        public DirectionKeyManager(KeyCode key1, KeyCode key2, Vector3 changePosition)
         {
-            key1 = key1Value;
-            key2 = key2Value;
-            changePosition = changePositionValue;
+            this.key1 = key1;
+            this.key2 = key2;
+            this.changePosition = changePosition;
         }
     }
 }
