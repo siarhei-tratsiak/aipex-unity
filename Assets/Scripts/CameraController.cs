@@ -4,13 +4,13 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform cameraTransform;
-    public float fastSpeed;
-    public float mouseZoomSpeed;
-    public float movementSpeed;
-    public float movementTime;
-    public float normalSpeed;
-    public float rotationAmount;
-    public Vector3 zoomAmount;
+    public float fastSpeed = 3f;
+    public float mouseZoomSpeed = 10f;
+    public float movementSpeed = 1f;
+    public float movementTime = 5f;
+    public float normalSpeed = 0.5f;
+    public float rotationAmount = 1f;
+    public Vector3 zoomAmount = new(0, -1, 1);
 
     private Vector3 dragCurrentPosition;
     private Vector3 dragStartPosition;
