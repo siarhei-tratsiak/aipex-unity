@@ -1,17 +1,22 @@
+using System;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
     public float fastSpeed;
-    public float normalSpeed;
     public float movementSpeed;
     public float movementTime;
+    public float normalSpeed;
+    public float rotationAmount;
+
     private Vector3 newPosition;
+    private Quaternion newRotation;
 
     // Start is called before the first frame update
     private void Start()
     {
         newPosition = transform.position;
+        newRotation = transform.rotation;
     }
 
     // Update is called once per frame
@@ -27,10 +32,25 @@ public class CameraController : MonoBehaviour
         Vector3 verticalPositionChange = transform.right * movementSpeed;
 
         DirectionKeyManager[] directionKeyManagers = {
-            new DirectionKeyManager(KeyCode.W, KeyCode.UpArrow, horizontalPositionChange),
-            new DirectionKeyManager(KeyCode.S, KeyCode.DownArrow, -horizontalPositionChange),
-            new DirectionKeyManager(KeyCode.D, KeyCode.RightArrow, verticalPositionChange),
-            new DirectionKeyManager(KeyCode.A, KeyCode.LeftArrow, -verticalPositionChange)
+            new DirectionKeyManager(
+                new KeyCode[2] { KeyCode.W, KeyCode.UpArrow },
+                horizontalPositionChange
+            ),
+
+            new DirectionKeyManager(
+                new KeyCode[2] { KeyCode.S, KeyCode.DownArrow },
+                -horizontalPositionChange
+            ),
+
+            new DirectionKeyManager(
+                new KeyCode[2] { KeyCode.D, KeyCode.RightArrow },
+                verticalPositionChange
+            ),
+
+            new DirectionKeyManager(
+                new KeyCode[2] { KeyCode.A, KeyCode.LeftArrow },
+                -verticalPositionChange
+            )
         };
 
         foreach (DirectionKeyManager directionKeyManager in directionKeyManagers)
@@ -38,12 +58,23 @@ public class CameraController : MonoBehaviour
             ShiftPositionIfKeyPressed(directionKeyManager);
         }
 
+        if (Input.GetKey(KeyCode.Q))
+        {
+            newRotation *= Quaternion.Euler(Vector3.up * rotationAmount);
+        }
+
+        if (Input.GetKey(KeyCode.E))
+        {
+            newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount);
+        }
+
         transform.position = Vector3.Lerp(transform.position, newPosition, Time.deltaTime * movementTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, Time.deltaTime * movementTime);
     }
 
     private void ShiftPositionIfKeyPressed(DirectionKeyManager directionKeyManager)
     {
-        bool isKeyPressed = Input.GetKey(directionKeyManager.key1) || Input.GetKey(directionKeyManager.key2);
+        bool isKeyPressed = Array.Exists(directionKeyManager.keys, key => Input.GetKey(key));
 
         if (isKeyPressed)
         {
@@ -53,14 +84,12 @@ public class CameraController : MonoBehaviour
 
     private class DirectionKeyManager
     {
-        public KeyCode key1;
-        public KeyCode key2;
+        public KeyCode[] keys;
         public Vector3 changePosition;
 
-        public DirectionKeyManager(KeyCode key1, KeyCode key2, Vector3 changePosition)
+        public DirectionKeyManager(KeyCode[] keys, Vector3 changePosition)
         {
-            this.key1 = key1;
-            this.key2 = key2;
+            this.keys = keys;
             this.changePosition = changePosition;
         }
     }
