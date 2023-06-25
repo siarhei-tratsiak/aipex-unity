@@ -159,7 +159,7 @@ public class CameraController : MonoBehaviour
         newRotation *= Quaternion.Euler(Vector3.up * amount);
     }
 
-    private class KeyManager
+    private struct KeyManager
     {
         public KeyCode[] keys;
         public Action callback;
