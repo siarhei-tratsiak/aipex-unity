@@ -4,21 +4,21 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform cameraTransform;
-    public Vector3 dragCurrentPosition;
-    public Vector3 dragStartPosition;
     public float fastSpeed;
     public float mouseZoomSpeed;
     public float movementSpeed;
     public float movementTime;
     public float normalSpeed;
-    public Vector3 rotateCurrentPosition;
-    public Vector3 rotateStartPosition;
     public float rotationAmount;
     public Vector3 zoomAmount;
 
+    private Vector3 dragCurrentPosition;
+    private Vector3 dragStartPosition;
     private Vector3 newPosition;
     private Quaternion newRotation;
     private Vector3 newZoom;
+    private Vector3 rotateCurrentPosition;
+    private Vector3 rotateStartPosition;
 
     // Start is called before the first frame update
     private void Start()
@@ -78,7 +78,8 @@ public class CameraController : MonoBehaviour
             Vector3 difference = rotateStartPosition - rotateCurrentPosition;
 
             rotateStartPosition = rotateCurrentPosition;
-            newRotation *= Quaternion.Euler(Vector3.up * -difference.x / 5f);
+
+            updateRotation(-difference.x / 5f);
         }
     }
 
@@ -89,52 +90,52 @@ public class CameraController : MonoBehaviour
         Vector3 verticalPositionChange = transform.right * movementSpeed;
         Quaternion rotationChange = Quaternion.Euler(Vector3.up * rotationAmount);
 
-        DirectionKeyManager[] directionKeyManagers = {
+        KeyManager[] keyManagers = {
             // TODO: create interface for the keys
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[2] { KeyCode.W, KeyCode.UpArrow },
                 () => newPosition += horizontalPositionChange
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[2] { KeyCode.S, KeyCode.DownArrow },
                 () => newPosition -= horizontalPositionChange
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[2] { KeyCode.D, KeyCode.RightArrow },
                 () => newPosition += verticalPositionChange
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[2] { KeyCode.A, KeyCode.LeftArrow },
                 () => newPosition -= verticalPositionChange
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[1] { KeyCode.Q },
-                () => newRotation *= Quaternion.Euler(Vector3.up * rotationAmount)
+                () => updateRotation(rotationAmount)
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[1] { KeyCode.E },
-                () => newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount)
+                () => updateRotation(-rotationAmount)
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[1] { KeyCode.R },
                 () => newZoom += zoomAmount
             ),
 
-            new DirectionKeyManager(
+            new KeyManager(
                 new KeyCode[1] { KeyCode.F },
                 () => newZoom -= zoomAmount
             ),
         };
 
-        foreach (DirectionKeyManager directionKeyManager in directionKeyManagers)
+        foreach (KeyManager keyManager in keyManagers)
         {
-            ShiftPositionIfKeyPressed(directionKeyManager);
+            ShiftPositionIfKeyPressed(keyManager);
         }
 
         float time = Time.deltaTime * movementTime;
@@ -143,22 +144,27 @@ public class CameraController : MonoBehaviour
         cameraTransform.localPosition = Vector3.Lerp(cameraTransform.localPosition, newZoom, time);
     }
 
-    private void ShiftPositionIfKeyPressed(DirectionKeyManager directionKeyManager)
+    private void ShiftPositionIfKeyPressed(KeyManager keyManager)
     {
-        bool isKeyPressed = Array.Exists(directionKeyManager.keys, key => Input.GetKey(key));
+        bool isKeyPressed = Array.Exists(keyManager.keys, key => Input.GetKey(key));
 
         if (isKeyPressed)
         {
-            directionKeyManager.callback();
+            keyManager.callback();
         }
     }
 
-    private class DirectionKeyManager
+    private void updateRotation(float amount)
+    {
+        newRotation *= Quaternion.Euler(Vector3.up * amount);
+    }
+
+    private class KeyManager
     {
         public KeyCode[] keys;
         public Action callback;
 
-        public DirectionKeyManager(KeyCode[] keys, Action callback)
+        public KeyManager(KeyCode[] keys, Action callback)
         {
             this.keys = keys;
             this.callback = callback;
