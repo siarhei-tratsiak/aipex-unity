@@ -7,9 +7,12 @@ public class CameraController : MonoBehaviour
     public Vector3 dragCurrentPosition;
     public Vector3 dragStartPosition;
     public float fastSpeed;
+    public float mouseZoomSpeed;
     public float movementSpeed;
     public float movementTime;
     public float normalSpeed;
+    public Vector3 rotateCurrentPosition;
+    public Vector3 rotateStartPosition;
     public float rotationAmount;
     public Vector3 zoomAmount;
 
@@ -56,6 +59,26 @@ public class CameraController : MonoBehaviour
                 dragCurrentPosition = ray.GetPoint(entry);
                 newPosition = transform.position + dragStartPosition - dragCurrentPosition;
             }
+        }
+
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            newZoom += Input.mouseScrollDelta.y * mouseZoomSpeed * zoomAmount;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            rotateStartPosition = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButton(1))
+        {
+            rotateCurrentPosition = Input.mousePosition;
+
+            Vector3 difference = rotateStartPosition - rotateCurrentPosition;
+
+            rotateStartPosition = rotateCurrentPosition;
+            newRotation *= Quaternion.Euler(Vector3.up * -difference.x / 5f);
         }
     }
 
