@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class HexGridLayout : MonoBehaviour
+public class HexGridManager : MonoBehaviour
 {
     [Header("Grid Settings")]
     public Vector2Int gridSize;
@@ -13,17 +13,17 @@ public class HexGridLayout : MonoBehaviour
     public bool isFlatTopped;
     public Material material;
 
-    private void OnEnable()
+    private float occupiedPlaceA;
+
+    private void Awake()
     {
-        if (Application.isPlaying)
-        {
-            LayoutGrid();
-        }
+        occupiedPlaceA = Mathf.Sqrt(3f) * outerSize;
     }
+
     // Start is called before the first frame update
     private void Start()
     {
-
+        LayoutGrid();
     }
 
     // Update is called once per frame
@@ -38,28 +38,30 @@ public class HexGridLayout : MonoBehaviour
         {
             for (int x = 0; x < gridSize.x; x++)
             {
-                GameObject tile = Instantiate(
-                    hexagonPrefab,
-                    GetPositionForHexFromCoordinate(new Vector2Int(x, y)),
-                    Quaternion.identity,
-                    transform
-                );
-
-                HexRenderer hexRenderer = tile.GetComponent<HexRenderer>();
-                Renderer renderer = tile.GetComponent<Renderer>();
-
-                hexRenderer.isFlatTopped = isFlatTopped;
-                hexRenderer.height = height;
-                hexRenderer.outerSize = outerSize;
-                hexRenderer.innerSize = innerSize;
-                //hexRenderer.material = material;
-                renderer.SetMaterials(new System.Collections.Generic.List<Material> { material });
-                hexRenderer.DrawMesh();
+                InstantiateHex(x, y);
             }
         }
     }
 
-    private Vector3 GetPositionForHexFromCoordinate(Vector2Int coordinate)
+    private void InstantiateHex(int x, int y)
+    {
+        HexRenderer hexRenderer = hexagonPrefab.GetComponent<HexRenderer>();
+
+        hexRenderer.isFlatTopped = isFlatTopped;
+        hexRenderer.height = height;
+        hexRenderer.outerSize = outerSize;
+        hexRenderer.innerSize = innerSize;
+        hexRenderer.material = material;
+
+        _ = Instantiate(
+            hexagonPrefab,
+            GetHexPosition(new Vector2Int(x, y)),
+            Quaternion.identity,
+            transform
+        );
+    }
+
+    private Vector3 GetHexPosition(Vector2Int coordinate)
     {
         int column = coordinate.x;
         int row = coordinate.y;
@@ -76,7 +78,7 @@ public class HexGridLayout : MonoBehaviour
         if (!isFlatTopped)
         {
             shouldOffset = (row % 2) == 0;
-            width = Mathf.Sqrt(3f) * size;
+            width = occupiedPlaceA;
             height = 2f * size;
 
             horizontalDistance = width;
@@ -91,7 +93,7 @@ public class HexGridLayout : MonoBehaviour
         {
             shouldOffset = (column % 2) == 0;
             width = 2f * size;
-            height = Mathf.Sqrt(3f) * size;
+            height = occupiedPlaceA;
 
             horizontalDistance = width * (3f / 4f);
             verticalDistance = height;

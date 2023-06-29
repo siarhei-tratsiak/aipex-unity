@@ -46,10 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 551ba54f8b3c2564897ef08308833239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  height: 10
+  height: 1
   innerSize: 0
-  isFlatTopped: 0
-  material: {fileID: 0}
+  isFlatTopped: 1
+  material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   outerSize: 6
 --- !u!33 &3971039239872201044
 MeshFilter:
