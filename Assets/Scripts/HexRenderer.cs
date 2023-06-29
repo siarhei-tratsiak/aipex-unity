@@ -9,6 +9,7 @@ public class HexRenderer : MonoBehaviour
     public Material material;
     public float outerSize;
 
+    private bool isValidated = false;
     private List<Face> m_faces;
     private Mesh m_mesh;
     private MeshFilter m_meshFilter;
@@ -31,7 +32,6 @@ public class HexRenderer : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-
     }
 
     private void OnEnable()
@@ -41,19 +41,20 @@ public class HexRenderer : MonoBehaviour
 
     private void OnValidate()
     {
-        if (Application.isPlaying && m_mesh != null)
-        {
-            DrawMesh();
-        }
+        isValidated = true;
     }
 
     // Update is called once per frame
     private void Update()
     {
+        if (isValidated)
+        {
+            DrawMesh();
+        }
 
     }
 
-    private void DrawMesh()
+    public void DrawMesh()
     {
         DrawFaces();
         CombineFaces();
