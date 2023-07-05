@@ -251,7 +251,7 @@ MonoBehaviour:
   outerSize: 6
   innerSize: 0
   height: 1
-  isFlatTopped: 1
+  isFlatTopped: 0
   material: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!4 &662731819
 Transform:
